@@ -269,6 +269,26 @@ func main() {
 	rdb = redis.NewClient(redisOpts)
 
 	mux := http.NewServeMux()
+	
+	// Health check endpoint
+	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
+		// Check Redis connection
+		if err := rdb.Ping(ctx).Err(); err != nil {
+			http.Error(w, "Redis unavailable", http.StatusServiceUnavailable)
+			return
+		}
+		writeJSON(w, map[string]string{"status": "healthy", "service": "snapshell-signaler"})
+	})
+	
+	// Root endpoint with service info
+	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, map[string]string{
+			"service": "SnapShell WebRTC Signaling Server",
+			"version": "1.0.0",
+			"endpoints": "/room/{id}/join, /room/{id}/offer, /room/{id}/answer, /room/{id}/ice",
+		})
+	})
+	
 	mux.HandleFunc("POST /room/{id}/join", joinRoom)
 	mux.HandleFunc("POST /room/{id}/offer", postOffer)
 	mux.HandleFunc("GET /room/{id}/offer", getOffer)

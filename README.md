@@ -12,7 +12,7 @@ SnapShell creates a **bidirectional WebRTC connection** between two terminals, a
 - **🎨 ASCII Art Conversion**: Advanced real-time video-to-ASCII conversion with dynamic terminal sizing
 - **📡 Multiple Connection Modes**:
   - **Signaling Server Mode**: Production-ready with Redis backend (recommended)
-  - **File-based Signaling**: Local testing using `/tmp/webrtc-signals/` 
+  - **File-based Signaling**: Local testing using `/tmp/webrtc-signals/`
   - **Manual Mode**: Copy-paste SDP for development/debugging
 - **🔄 Bidirectional Communication**: Both peers send AND receive video simultaneously
 - **⚡ WebRTC Performance**: Direct peer-to-peer connection with ICE candidate optimization
@@ -34,23 +34,26 @@ SnapShell creates a **bidirectional WebRTC connection** between two terminals, a
 
 ### Prerequisites
 
-- **Go 1.24+** 
+- **Go 1.24+**
 - **OpenCV 4.x** (for video capture)
+
   ```bash
   # macOS
   brew install opencv
-  
+
   # Ubuntu/Debian
   sudo apt-get install libopencv-dev
-  
+
   # Arch Linux
   sudo pacman -S opencv
   ```
+
 - **Redis** (for signaling server)
+
   ```bash
   # macOS
   brew install redis
-  
+
   # Ubuntu/Debian
   sudo apt-get install redis-server
   ```
@@ -72,18 +75,21 @@ go build -o signaler cmd/signaler/main.go # Signaling server
 ### 1. 🌐 Signaling Server Mode (Recommended)
 
 **Terminal 1 - Start Redis & Signaling Server:**
+
 ```bash
 redis-server &                    # Start Redis in background
 ./signaler                        # Start signaling server on :8080
 ```
 
 **Terminal 2 - First User (Caller):**
+
 ```bash
 ./snapshell -signaled-o --room demo123
 # Webcam will start, ASCII video begins streaming
 ```
 
 **Terminal 3 - Second User (Answerer):**
+
 ```bash
 ./snapshell -signaled-a --room demo123
 # Connects to same room, bidirectional video starts
@@ -92,12 +98,14 @@ redis-server &                    # Start Redis in background
 ### 2. 📁 File-based Signaling (Local Testing)
 
 **Terminal 1 (Auto Caller):**
+
 ```bash
 ./snapshell -auto-o
 # Creates offer file in /tmp/webrtc-signals/
 ```
 
 **Terminal 2 (Auto Answerer):**
+
 ```bash
 ./snapshell -auto-a
 # Reads offer, creates answer, establishes connection
@@ -106,12 +114,14 @@ redis-server &                    # Start Redis in background
 ### 3. 🔧 Manual Mode (Development)
 
 **Terminal 1 (Manual Caller):**
+
 ```bash
 ./snapshell -o
 # Displays offer SDP - copy and paste to answerer
 ```
 
 **Terminal 2 (Manual Answerer):**
+
 ```bash
 ./snapshell -a
 # Paste offer, displays answer SDP - copy back to caller
@@ -122,16 +132,19 @@ redis-server &                    # Start Redis in background
 ### Core Components
 
 1. **WebRTC Client (`cmd/main.go`)**
+
    - Handles peer connection lifecycle
    - Manages ICE candidate exchange
    - Routes between different signaling modes
 
 2. **Video Pipeline (`internal/capture/webcam.go` → `internal/render/ascii.go`)**
+
    - OpenCV webcam capture with configurable properties
    - Real-time ASCII conversion with intelligent scaling
    - Terminal-aware rendering (respects COLUMNS/LINES)
 
 3. **Signaling Server (`cmd/signaler/main.go`)**
+
    - Redis-backed HTTP server for WebRTC signaling
    - Server-Sent Events (SSE) for real-time ICE delivery
    - Room-based session management
@@ -167,7 +180,7 @@ export PORT="8080"                                              # Signaler port
 ./snapshell -signaled-o --room <room> [--id <client>] [--server <url>]
 ./snapshell -signaled-a --room <room> [--id <client>] [--server <url>]
 ./snapshell -auto-o     # File signaling caller
-./snapshell -auto-a     # File signaling answerer  
+./snapshell -auto-a     # File signaling answerer
 ./snapshell -o          # Manual caller
 ./snapshell -a          # Manual answerer
 
@@ -202,10 +215,11 @@ The signaling server will be available at `https://your-snapshell-app.herokuapp.
 ## 🛠️ Development & Debugging
 
 ### Project Structure
+
 ```
 snapshell/
 ├── cmd/
-│   ├── main.go          # Main client application  
+│   ├── main.go          # Main client application
 │   └── signaler/        # Redis-backed signaling server
 ├── internal/
 │   ├── capture/         # OpenCV webcam integration
@@ -224,7 +238,7 @@ snapshell/
 # Format code
 go fmt ./...
 
-# Run tests  
+# Run tests
 go test ./...
 
 # Build for multiple platforms
@@ -258,13 +272,15 @@ redis-cli keys "room:*"
 ## 🎯 Future Roadmap
 
 ### Phase 2: Enhanced Features
+
 - **Screen Capture**: Desktop/window sharing alongside webcam
 - **Audio Support**: WebRTC audio channels with terminal visualizer
 - **Multi-party**: Support for 3+ participants in a room
 - **Recording**: Save ASCII sessions to files
 - **Custom ASCII**: User-defined character sets and color palettes
 
-### Phase 3: Advanced Capabilities  
+### Phase 3: Advanced Capabilities
+
 - **Bandwidth Adaptation**: Dynamic quality scaling based on connection
 - **Mobile Support**: iOS/Android terminal apps
 - **Web Interface**: Browser-based viewer for non-terminal users
@@ -272,6 +288,7 @@ redis-cli keys "room:*"
 - **Authentication**: User accounts and private rooms
 
 ### Phase 4: Platform Features
+
 - **Cloud Deployment**: One-click cloud instance deployment
 - **CDN Integration**: Global signaling server distribution
 - **Analytics**: Connection quality and usage metrics
@@ -283,25 +300,28 @@ We welcome contributions! Areas of focus:
 
 - **Performance**: Optimize ASCII conversion algorithms
 - **Features**: Implement roadmap items
-- **Platforms**: Windows/Linux compatibility testing  
+- **Platforms**: Windows/Linux compatibility testing
 - **Documentation**: Usage examples and tutorials
 - **Testing**: Unit tests and integration tests
 
 ## 📝 Technical Notes
 
 ### WebRTC Implementation Details
+
 - Uses **Pion WebRTC v4** for Go-native implementation
 - **Data Channels** for ASCII transmission (not video tracks)
 - **STUN servers** for NAT traversal
 - **ICE candidates** managed through Redis pub/sub
 
 ### Performance Characteristics
+
 - **Latency**: ~100-200ms including ASCII conversion
 - **Bandwidth**: ~1-5 KB/s per stream (vs. MB/s for raw video)
 - **CPU Usage**: Moderate due to OpenCV processing
 - **Memory**: Minimal frame buffering
 
 ### ASCII Conversion Algorithm
+
 - **Grayscale conversion** using OpenCV color space transformation
 - **Intelligent scaling** maintaining aspect ratio with terminal constraints
 - **Character mapping** using 10-level intensity scale: ` .:=-+*#%@`

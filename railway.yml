@@ -1,0 +1,7 @@
+build:
+  builder: dockerfile
+deploy:
+  startCommand: ./signaler
+  healthcheckPath: /
+  healthcheckTimeout: 100
+  restartPolicyType: on_failure
