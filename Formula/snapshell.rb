@@ -1,7 +1,7 @@
 class Snapshell < Formula
   desc "Real-time ASCII video sharing via WebRTC in your terminal"
   homepage "https://github.com/saswatsam786/snapshell"
-  url "https://github.com/saswatsam786/snapshell/archive/refs/tags/v1.0.0.tar.gz"
+  url "https://github.com/saswatsam786/snapshell/archive/refs/tags/v1.0.1.tar.gz"
   sha256 "0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5"
   license "MIT"
   head "https://github.com/saswatsam786/snapshell.git", branch: "main"
@@ -16,7 +16,7 @@ class Snapshell < Formula
     # Set OpenCV paths for gocv
     ENV["PKG_CONFIG_PATH"] = "#{Formula["opencv"].opt_lib}/pkgconfig"
     
-    system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd"
+    system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/main.go"
   end
 
   test do
