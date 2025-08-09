@@ -72,7 +72,7 @@ curl -sSL https://raw.githubusercontent.com/saswatsam786/snapshell/main/install.
 Download pre-built binaries from [GitHub Releases](https://github.com/saswatsam786/snapshell/releases):
 
 - **Linux**: `snapshell-linux-amd64`
-- **macOS**: `snapshell-darwin-amd64` 
+- **macOS**: `snapshell-darwin-amd64`
 - **Windows**: `snapshell-windows-amd64.exe`
 
 ```bash
@@ -104,12 +104,14 @@ go build -o signaler cmd/signaler/main.go
 **Use our deployed signaling server - no setup required!**
 
 **Terminal 1 - First User (Caller):**
+
 ```bash
 snapshell -signaled-o --room demo123 --server https://snapshell.onrender.com
 # Webcam will start, ASCII video begins streaming
 ```
 
 **Terminal 2 - Second User (Answerer):**
+
 ```bash
 snapshell -signaled-a --room demo123 --server https://snapshell.onrender.com
 # Connects to same room, bidirectional video starts
@@ -120,17 +122,20 @@ snapshell -signaled-a --room demo123 --server https://snapshell.onrender.com
 **If you want to run your own signaling server:**
 
 **Terminal 1 - Start Redis & Signaling Server:**
+
 ```bash
 redis-server &                    # Start Redis in background
 ./signaler                        # Start signaling server on :8080
 ```
 
 **Terminal 2 - First User (Caller):**
+
 ```bash
 snapshell -signaled-o --room demo123 --server http://localhost:8080
 ```
 
 **Terminal 3 - Second User (Answerer):**
+
 ```bash
 snapshell -signaled-a --room demo123 --server http://localhost:8080
 ```

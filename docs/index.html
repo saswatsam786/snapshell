@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapShell - Terminal Video Sharing</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Monaco', 'Menlo', monospace; 
+            background: #0d1117; 
+            color: #c9d1d9; 
+            line-height: 1.6;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1 { 
+            font-size: 3em; 
+            text-align: center; 
+            margin-bottom: 0.5em;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle { 
+            text-align: center; 
+            font-size: 1.2em; 
+            margin-bottom: 2em; 
+            color: #7c3aed;
+        }
+        .terminal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Monaco', monospace;
+        }
+        .install-cmd {
+            background: #238636;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .feature {
+            background: #21262d;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #7c3aed;
+        }
+        .demo-ascii {
+            font-family: monospace;
+            background: #000;
+            color: #0f0;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin: 20px 0;
+            white-space: pre-line;
+        }
+        .cta {
+            text-align: center;
+            margin: 40px 0;
+        }
+        .btn {
+            display: inline-block;
+            background: #7c3aed;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 0 10px;
+            transition: background 0.3s;
+        }
+        .btn:hover { background: #5b21b6; }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #8b949e;
+            border-top: 1px solid #30363d;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📸 SnapShell</h1>
+        <p class="subtitle">Real-time ASCII video sharing in your terminal</p>
+        
+        <div class="terminal">
+            <h2>🚀 Quick Install</h2>
+            <div class="install-cmd">
+                curl -sSL https://raw.githubusercontent.com/saswatsam786/snapshell/main/install.sh | bash
+            </div>
+        </div>
+
+        <div class="demo-ascii">
+██╗  ██╗███████╗██╗     ██╗      ██████╗ 
+██║  ██║██╔════╝██║     ██║     ██╔═══██╗
+███████║█████╗  ██║     ██║     ██║   ██║
+██╔══██║██╔══╝  ██║     ██║     ██║   ██║
+██║  ██║███████╗███████╗███████╗╚██████╔╝
+╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝ ╚═════╝ 
+        Live ASCII Video Feed!
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <h3>🎥 Real-time Video</h3>
+                <p>Share webcam feed as beautiful ASCII art in real-time with WebRTC technology</p>
+            </div>
+            <div class="feature">
+                <h3>🖥️ Terminal Native</h3>
+                <p>Works in any terminal, SSH session, or console. No GUI required!</p>
+            </div>
+            <div class="feature">
+                <h3>⚡ Ultra Low Latency</h3>
+                <p>Direct peer-to-peer connections with ~100-200ms latency</p>
+            </div>
+            <div class="feature">
+                <h3>🌍 Cross Platform</h3>
+                <p>Linux, macOS, Windows support with one-line installation</p>
+            </div>
+        </div>
+
+        <div class="terminal">
+            <h2>🎮 Usage</h2>
+            <p><strong>Start a video session:</strong></p>
+            <div style="margin: 10px 0; font-family: monospace;">
+                # Caller (video sender)<br>
+                snapshell -signaled-o --room demo123 --server https://snapshell.onrender.com<br><br>
+                # Answerer (video receiver)<br>
+                snapshell -signaled-a --room demo123 --server https://snapshell.onrender.com
+            </div>
+        </div>
+
+        <div class="cta">
+            <a href="https://github.com/saswatsam786/snapshell" class="btn">📖 View on GitHub</a>
+            <a href="https://github.com/saswatsam786/snapshell/releases" class="btn">📦 Download Binary</a>
+        </div>
+
+        <div class="footer">
+            <p>Made with ❤️ by <a href="https://github.com/saswatsam786" style="color: #7c3aed;">Saswat Samal</a></p>
+            <p>Open source • MIT License • WebRTC powered</p>
+        </div>
+    </div>
+</body>
+</html>
