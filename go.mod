@@ -1,4 +1,4 @@
-module snapshell
+module github.com/saswatsam786/snapshell
 
 go 1.21
 

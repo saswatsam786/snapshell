@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"snapshell/internal/capture"
+	"github.com/saswatsam786/snapshell/internal/capture"
 
 	"gocv.io/x/gocv"
 )

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"snapshell/internal/webrtc"
+	"github.com/saswatsam786/snapshell/internal/webrtc"
 )
 
 func getDefaultServer() string {

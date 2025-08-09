@@ -11,9 +11,9 @@ import (
 	"syscall"
 	"time"
 
-	"snapshell/internal/capture"
-	"snapshell/internal/render"
-	sig "snapshell/internal/signal"
+	"github.com/saswatsam786/snapshell/internal/capture"
+	"github.com/saswatsam786/snapshell/internal/render"
+	sig "github.com/saswatsam786/snapshell/internal/signal"
 
 	"github.com/pion/webrtc/v4"
 	"gocv.io/x/gocv"

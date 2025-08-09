@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	"snapshell/internal/capture"
-	"snapshell/internal/render"
+	"github.com/saswatsam786/snapshell/internal/capture"
+	"github.com/saswatsam786/snapshell/internal/render"
 
 	"github.com/pion/webrtc/v4"
 	"gocv.io/x/gocv"
