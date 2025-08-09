@@ -39,11 +39,14 @@ case $OS in
     linux)
         BINARY_NAME="snapshell-linux-amd64"
         ;;
-    darwin)
-        BINARY_NAME="snapshell-darwin-amd64"
-        ;;
     *)
-        echo -e "${RED}❌ Unsupported OS: $OS${NC}"
+        echo -e "${RED}❌ Currently only Linux x86_64 is supported via binary releases${NC}"
+        echo -e "${YELLOW}Your system: $OS-$ARCH${NC}"
+        echo ""
+        echo -e "${BLUE}🔧 To build from source:${NC}"
+        echo -e "  git clone https://github.com/$REPO"
+        echo -e "  cd snapshell"
+        echo -e "  go build -o snapshell cmd/main.go"
         exit 1
         ;;
 esac

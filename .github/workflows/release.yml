@@ -3,102 +3,85 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
   workflow_dispatch:
 
 jobs:
   build:
-    name: Build for ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            name: linux
-            arch: amd64
-          - os: macos-latest
-            name: darwin
-            arch: amd64
-          - os: windows-latest
-            name: windows
-            arch: amd64
-
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.24'
-    
-    - name: Install OpenCV (Ubuntu)
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libopencv-dev
-    
-    - name: Install OpenCV (macOS)
-      if: matrix.os == 'macos-latest'
-      run: |
-        brew install opencv
-    
-    - name: Install OpenCV (Windows)
-      if: matrix.os == 'windows-latest'
-      run: |
-        choco install opencv
-    
-    - name: Build
-      run: |
-        if [ "${{ matrix.os }}" = "windows-latest" ]; then
-          go build -o snapshell-${{ matrix.name }}-${{ matrix.arch }}.exe cmd/main.go
-        else
-          go build -o snapshell-${{ matrix.name }}-${{ matrix.arch }} cmd/main.go
-        fi
-      shell: bash
-    
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: snapshell-${{ matrix.name }}-${{ matrix.arch }}
-        path: snapshell-*
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+
+      - name: Install OpenCV dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libopencv-dev libopencv-contrib-dev pkg-config
+
+      - name: Build Linux AMD64
+        env:
+          CGO_ENABLED: 1
+          GOOS: linux
+          GOARCH: amd64
+        run: |
+          go build -ldflags="-s -w" -o snapshell-linux-amd64 cmd/main.go
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: snapshell-linux-amd64
+          path: snapshell-linux-amd64
 
   release:
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
-    
+
     steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: artifacts
-        pattern: snapshell-*
-        merge-multiple: true
-    
-    - name: Create Release
-      uses: softprops/action-gh-release@v2
-      with:
-        files: |
-          artifacts/snapshell-*
-        body: |
-          # SnapShell Release
-          
-          ## Installation
-          
-          Download the binary for your platform:
-          - **Linux**: `snapshell-linux-amd64`
-          - **macOS**: `snapshell-darwin-amd64` 
-          - **Windows**: `snapshell-windows-amd64.exe`
-          
-          ## Usage
-          
-          ```bash
-          # Make executable (Linux/macOS)
-          chmod +x snapshell-*
-          
-          # Start video session
-          ./snapshell-* -signaled-o --room demo123 --server https://snapshell.onrender.com
-          ./snapshell-* -signaled-a --room demo123 --server https://snapshell.onrender.com
-          ```
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: snapshell-*
+          merge-multiple: true
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/snapshell-*
+          body: |
+            # SnapShell Release
+
+            ## Quick Install (Linux/macOS)
+            
+            ```bash
+            curl -sSL https://raw.githubusercontent.com/saswatsam786/snapshell/main/install.sh | bash
+            ```
+
+            ## Manual Download
+
+            - **Linux**: `snapshell-linux-amd64`
+
+            ## Usage
+
+            ```bash
+            # Make executable 
+            chmod +x snapshell-linux-amd64
+
+            # Start video session (offerer)
+            ./snapshell-linux-amd64 -signaled-o --room demo123 --server https://snapshell.onrender.com
+            
+            # Join video session (answerer) 
+            ./snapshell-linux-amd64 -signaled-a --room demo123 --server https://snapshell.onrender.com
+            ```
+            
+            ## About
+            
+            SnapShell converts live webcam video to ASCII art in real-time and shares it through WebRTC peer-to-peer connections. Perfect for terminal-based video sharing!
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

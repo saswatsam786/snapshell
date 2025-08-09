@@ -1,6 +1,6 @@
 module snapshell
 
-go 1.24.2
+go 1.21
 
 require (
 	github.com/pion/webrtc/v4 v4.1.3
