@@ -5,12 +5,14 @@
 ### 🏆 **Option 1: Railway (Recommended)**
 
 **Why Railway?**
+
 - Built-in Redis (no extra cost)
 - $5/month free credits
 - Simple one-command deployment
 - Easy migration to AWS later
 
 **Deploy Steps:**
+
 ```bash
 # 1. Install Railway CLI
 npm install -g @railway/cli
@@ -26,19 +28,22 @@ railway domain     # Shows your deployment URL
 ```
 
 **Environment Variables (Auto-configured):**
+
 - `REDIS_URL` - Automatically set by Railway
 - `PORT` - Automatically set by Railway
 
 ### 🥈 **Option 2: Render (Free)**
 
 **Steps:**
+
 1. Go to [render.com](https://render.com)
-2. Connect your GitHub repository 
+2. Connect your GitHub repository
 3. Create **Web Service** from your repo
 4. Create **Redis** service
 5. Link Redis URL to web service
 
 **Manual Environment Variables:**
+
 - `REDIS_URL` - Copy from Render Redis service
 - `PORT` - Set to `10000` (Render default)
 
@@ -53,12 +58,14 @@ git push heroku main
 ## 🔧 Production Configuration
 
 ### Environment Variables Needed:
+
 ```bash
 REDIS_URL=redis://user:pass@host:port/db  # Redis connection
 PORT=8080                                  # Server port (auto-set by platforms)
 ```
 
 ### Health Check Endpoints:
+
 - `GET /health` - Service health + Redis connectivity
 - `GET /` - Service information and available endpoints
 
@@ -90,6 +97,7 @@ When ready for AWS:
 ## 🎯 **My Recommendation**
 
 **Start with Railway** because:
+
 - ✅ Free tier covers your initial needs
 - ✅ Built-in Redis (no separate setup)
 - ✅ Excellent Go support
@@ -97,6 +105,7 @@ When ready for AWS:
 - ✅ Better performance than free alternatives
 
 **Deploy Command:**
+
 ```bash
 railway login
 railway init

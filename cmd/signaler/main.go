@@ -254,22 +254,35 @@ func main() {
 	if env := os.Getenv("REDIS_ADDR"); env != "" {
 		redisAddr = env
 	}
-
+	
 	redisOpts := &redis.Options{Addr: redisAddr}
-
+	
 	// Support full Redis URL format
 	if redisURL := os.Getenv("REDIS_URL"); redisURL != "" {
+		log.Printf("Using REDIS_URL: %s", redisURL)
 		opts, err := redis.ParseURL(redisURL)
 		if err != nil {
 			log.Fatal("Invalid REDIS_URL:", err)
 		}
+		log.Printf("Parsed Redis config - Addr: %s, Username: %s", opts.Addr, opts.Username)
 		redisOpts = opts
+	} else {
+		log.Printf("No REDIS_URL found, using default: %s", redisAddr)
+	}
+	
+	rdb = redis.NewClient(redisOpts)
+	
+	// Test Redis connection immediately
+	log.Println("Testing Redis connection...")
+	if err := rdb.Ping(ctx).Err(); err != nil {
+		log.Printf("❌ Redis connection failed: %v", err)
+		log.Printf("Redis config: Addr=%s, Username=%s", redisOpts.Addr, redisOpts.Username)
+	} else {
+		log.Println("✅ Redis connection successful!")
 	}
 
-	rdb = redis.NewClient(redisOpts)
-
 	mux := http.NewServeMux()
-	
+
 	// Health check endpoint
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
 		// Check Redis connection
@@ -279,16 +292,16 @@ func main() {
 		}
 		writeJSON(w, map[string]string{"status": "healthy", "service": "snapshell-signaler"})
 	})
-	
+
 	// Root endpoint with service info
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, map[string]string{
-			"service": "SnapShell WebRTC Signaling Server",
-			"version": "1.0.0",
+			"service":   "SnapShell WebRTC Signaling Server",
+			"version":   "1.0.0",
 			"endpoints": "/room/{id}/join, /room/{id}/offer, /room/{id}/answer, /room/{id}/ice",
 		})
 	})
-	
+
 	mux.HandleFunc("POST /room/{id}/join", joinRoom)
 	mux.HandleFunc("POST /room/{id}/offer", postOffer)
 	mux.HandleFunc("GET /room/{id}/offer", getOffer)
