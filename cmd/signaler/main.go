@@ -254,9 +254,9 @@ func main() {
 	if env := os.Getenv("REDIS_ADDR"); env != "" {
 		redisAddr = env
 	}
-	
+
 	redisOpts := &redis.Options{Addr: redisAddr}
-	
+
 	// Support full Redis URL format
 	if redisURL := os.Getenv("REDIS_URL"); redisURL != "" {
 		log.Printf("Using REDIS_URL: %s", redisURL)
@@ -269,9 +269,9 @@ func main() {
 	} else {
 		log.Printf("No REDIS_URL found, using default: %s", redisAddr)
 	}
-	
+
 	rdb = redis.NewClient(redisOpts)
-	
+
 	// Test Redis connection immediately
 	log.Println("Testing Redis connection...")
 	if err := rdb.Ping(ctx).Err(); err != nil {

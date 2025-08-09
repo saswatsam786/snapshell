@@ -58,44 +58,84 @@ SnapShell creates a **bidirectional WebRTC connection** between two terminals, a
   sudo apt-get install redis-server
   ```
 
-### Installation & Build
+### Installation
+
+#### 🚀 **Quick Install (Recommended)**
+
+```bash
+# One-line installation
+curl -sSL https://raw.githubusercontent.com/saswatsam786/snapshell/main/install.sh | bash
+```
+
+#### 📦 **Manual Download**
+
+Download pre-built binaries from [GitHub Releases](https://github.com/saswatsam786/snapshell/releases):
+
+- **Linux**: `snapshell-linux-amd64`
+- **macOS**: `snapshell-darwin-amd64` 
+- **Windows**: `snapshell-windows-amd64.exe`
+
+```bash
+# Make executable (Linux/macOS)
+chmod +x snapshell-*
+
+# Ready to use!
+./snapshell-* --help
+```
+
+#### 🔨 **Build from Source**
 
 ```bash
 git clone https://github.com/saswatsam786/snapshell.git
 cd snapshell
 go mod download
 
-# Build both binaries
-go build -o snapshell cmd/main.go        # Main client
-go build -o signaler cmd/signaler/main.go # Signaling server
+# Build client
+go build -o snapshell cmd/main.go
+
+# Build signaling server (optional - already deployed)
+go build -o signaler cmd/signaler/main.go
 ```
 
 ## 🎮 Usage Modes
 
-### 1. 🌐 Signaling Server Mode (Recommended)
+### 1. 🌐 Production Server Mode (Recommended)
+
+**Use our deployed signaling server - no setup required!**
+
+**Terminal 1 - First User (Caller):**
+```bash
+snapshell -signaled-o --room demo123 --server https://snapshell.onrender.com
+# Webcam will start, ASCII video begins streaming
+```
+
+**Terminal 2 - Second User (Answerer):**
+```bash
+snapshell -signaled-a --room demo123 --server https://snapshell.onrender.com
+# Connects to same room, bidirectional video starts
+```
+
+### 2. 🏠 Local Signaling Server (Development)
+
+**If you want to run your own signaling server:**
 
 **Terminal 1 - Start Redis & Signaling Server:**
-
 ```bash
 redis-server &                    # Start Redis in background
 ./signaler                        # Start signaling server on :8080
 ```
 
 **Terminal 2 - First User (Caller):**
-
 ```bash
-./snapshell -signaled-o --room demo123
-# Webcam will start, ASCII video begins streaming
+snapshell -signaled-o --room demo123 --server http://localhost:8080
 ```
 
 **Terminal 3 - Second User (Answerer):**
-
 ```bash
-./snapshell -signaled-a --room demo123
-# Connects to same room, bidirectional video starts
+snapshell -signaled-a --room demo123 --server http://localhost:8080
 ```
 
-### 2. 📁 File-based Signaling (Local Testing)
+### 3. 📁 File-based Signaling (Local Testing)
 
 **Terminal 1 (Auto Caller):**
 
@@ -111,7 +151,7 @@ redis-server &                    # Start Redis in background
 # Reads offer, creates answer, establishes connection
 ```
 
-### 3. 🔧 Manual Mode (Development)
+### 4. 🔧 Manual Mode (Development)
 
 **Terminal 1 (Manual Caller):**
 
