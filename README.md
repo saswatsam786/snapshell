@@ -60,17 +60,31 @@ SnapShell creates a **bidirectional WebRTC connection** between two terminals, a
 
 ### Installation
 
-#### 🍺 **Homebrew (Recommended for macOS)**
+#### 🍺 **Homebrew (macOS)**
 
+**Option 1: Local Formula (Recommended)**
 ```bash
-# Install directly from GitHub
-brew install https://raw.githubusercontent.com/saswatsam786/snapshell/main/Formula/snapshell.rb
-
-# Ready to use!
-snapshell --help
+# Clone repository and install locally
+git clone https://github.com/saswatsam786/snapshell.git
+cd snapshell
+brew install --build-from-source --HEAD --formula ./Formula/snapshell.rb
 ```
 
-Homebrew automatically handles all dependencies including OpenCV, making this the easiest installation method for macOS users.
+**Option 2: Manual Dependencies + Build**
+```bash
+# Install dependencies via Homebrew
+brew install opencv pkg-config go
+
+# Clone and build
+git clone https://github.com/saswatsam786/snapshell.git
+cd snapshell
+go build -o snapshell cmd/main.go
+
+# Optional: Install to system
+sudo mv snapshell /usr/local/bin/
+```
+
+> **Note**: A proper Homebrew tap is coming soon for one-command installation!
 
 #### 🚀 **Quick Install Script (Linux)**
 
@@ -89,7 +103,7 @@ cd snapshell
 # macOS
 brew install opencv pkg-config go
 
-# Ubuntu/Debian  
+# Ubuntu/Debian
 sudo apt-get install libopencv-dev libopencv-contrib-dev pkg-config golang-go
 
 # Build the client
@@ -101,8 +115,6 @@ go build -o signaler cmd/signaler/main.go
 # Ready to use!
 ./snapshell --help
 ```
-
-
 
 ## 🎮 Usage Modes
 

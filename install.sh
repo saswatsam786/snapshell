@@ -39,24 +39,34 @@ case $OS in
     linux)
         BINARY_NAME="snapshell-linux-amd64"
         ;;
-    *)
-        echo -e "${BLUE}🔧 To build from source:${NC}"
+    darwin)
+        echo -e "${YELLOW}🍺 For macOS, we recommend using Homebrew:${NC}"
         echo ""
-        echo -e "${GREEN}# Clone repository (requires access)${NC}"
-        echo -e "git clone https://github.com/$REPO"
+        echo -e "${GREEN}# Option 1: Local formula (recommended)${NC}"
+        echo -e "git clone https://github.com/$REPO.git"
         echo -e "cd snapshell"
+        echo -e "brew install --build-from-source --HEAD --formula ./Formula/snapshell.rb"
         echo ""
-        echo -e "${GREEN}# Install dependencies${NC}"
-        if [ "$OS" = "darwin" ]; then
-            echo -e "brew install opencv pkg-config go"
-        else
-            echo -e "sudo apt-get install libopencv-dev libopencv-contrib-dev pkg-config golang-go"
-        fi
-        echo ""
-        echo -e "${GREEN}# Build${NC}"
+        echo -e "${GREEN}# Option 2: Manual dependencies${NC}"
+        echo -e "brew install opencv pkg-config go"
+        echo -e "git clone https://github.com/$REPO.git"
+        echo -e "cd snapshell"
         echo -e "go build -o snapshell cmd/main.go"
         echo ""
-        echo -e "${BLUE}For public distribution, the repository needs to be made public.${NC}"
+        echo -e "${BLUE}Homebrew automatically handles OpenCV and all dependencies!${NC}"
+        exit 0
+        ;;
+    *)
+        echo -e "${RED}❌ Currently only Linux x86_64 is supported via binary releases${NC}"
+        echo -e "${YELLOW}Your system: $OS-$ARCH${NC}"
+        echo ""
+        echo -e "${BLUE}🍺 For macOS, use Homebrew:${NC}"
+        echo -e "  brew install https://raw.githubusercontent.com/$REPO/main/Formula/snapshell.rb"
+        echo ""
+        echo -e "${BLUE}🔧 Or build from source:${NC}"
+        echo -e "  git clone https://github.com/$REPO"
+        echo -e "  cd snapshell"
+        echo -e "  go build -o snapshell cmd/main.go"
         exit 1
         ;;
 esac
