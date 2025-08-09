@@ -24,7 +24,7 @@ After installation, you can use SnapShell directly:
 # Start video sharing session (offerer)
 snapshell -signaled-o --room demo123 --server https://snapshell.onrender.com
 
-# Join video session (answerer)  
+# Join video session (answerer)
 snapshell -signaled-a --room demo123 --server https://snapshell.onrender.com
 ```
 
