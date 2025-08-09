@@ -60,10 +60,22 @@ SnapShell creates a **bidirectional WebRTC connection** between two terminals, a
 
 ### Installation
 
-#### 🚀 **Quick Install (Recommended)**
+#### 🍺 **Homebrew (Recommended for macOS)**
 
 ```bash
-# One-line installation
+# Add the tap and install in one command
+brew install https://raw.githubusercontent.com/saswatsam786/snapshell/main/Formula/snapshell.rb
+
+# Ready to use!
+snapshell --help
+```
+
+Homebrew automatically handles all dependencies including OpenCV, making this the easiest installation method for macOS users.
+
+#### 🚀 **Quick Install Script (Linux)**
+
+```bash
+# One-line installation for Linux
 curl -sSL https://raw.githubusercontent.com/saswatsam786/snapshell/main/install.sh | bash
 ```
 
@@ -72,15 +84,13 @@ curl -sSL https://raw.githubusercontent.com/saswatsam786/snapshell/main/install.
 Download pre-built binaries from [GitHub Releases](https://github.com/saswatsam786/snapshell/releases):
 
 - **Linux**: `snapshell-linux-amd64`
-- **macOS**: `snapshell-darwin-amd64`
-- **Windows**: `snapshell-windows-amd64.exe`
 
 ```bash
-# Make executable (Linux/macOS)
-chmod +x snapshell-*
+# Make executable
+chmod +x snapshell-linux-amd64
 
 # Ready to use!
-./snapshell-* --help
+./snapshell-linux-amd64 --help
 ```
 
 #### 🔨 **Build from Source**

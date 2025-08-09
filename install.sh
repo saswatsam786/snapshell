@@ -39,11 +39,22 @@ case $OS in
     linux)
         BINARY_NAME="snapshell-linux-amd64"
         ;;
+    darwin)
+        echo -e "${YELLOW}🍺 For macOS, we recommend using Homebrew:${NC}"
+        echo ""
+        echo -e "${GREEN}brew install https://raw.githubusercontent.com/$REPO/main/Formula/snapshell.rb${NC}"
+        echo ""
+        echo -e "${BLUE}Homebrew automatically handles OpenCV and all dependencies!${NC}"
+        exit 0
+        ;;
     *)
         echo -e "${RED}❌ Currently only Linux x86_64 is supported via binary releases${NC}"
         echo -e "${YELLOW}Your system: $OS-$ARCH${NC}"
         echo ""
-        echo -e "${BLUE}🔧 To build from source:${NC}"
+        echo -e "${BLUE}🍺 For macOS, use Homebrew:${NC}"
+        echo -e "  brew install https://raw.githubusercontent.com/$REPO/main/Formula/snapshell.rb"
+        echo ""
+        echo -e "${BLUE}🔧 Or build from source:${NC}"
         echo -e "  git clone https://github.com/$REPO"
         echo -e "  cd snapshell"
         echo -e "  go build -o snapshell cmd/main.go"

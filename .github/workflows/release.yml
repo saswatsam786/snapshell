@@ -1,9 +1,8 @@
 name: Build and Release
 
 on:
-  push:
-    tags:
-      - "v*"
+  # Disabled due to OpenCV compilation issues
+  # Use Homebrew formula instead: Formula/snapshell.rb
   workflow_dispatch:
 
 jobs:
@@ -58,7 +57,7 @@ jobs:
             # SnapShell Release
 
             ## Quick Install (Linux/macOS)
-            
+
             ```bash
             curl -sSL https://raw.githubusercontent.com/saswatsam786/snapshell/main/install.sh | bash
             ```
@@ -75,13 +74,13 @@ jobs:
 
             # Start video session (offerer)
             ./snapshell-linux-amd64 -signaled-o --room demo123 --server https://snapshell.onrender.com
-            
+
             # Join video session (answerer) 
             ./snapshell-linux-amd64 -signaled-a --room demo123 --server https://snapshell.onrender.com
             ```
-            
+
             ## About
-            
+
             SnapShell converts live webcam video to ASCII art in real-time and shares it through WebRTC peer-to-peer connections. Perfect for terminal-based video sharing!
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
