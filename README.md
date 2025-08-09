@@ -63,6 +63,7 @@ SnapShell creates a **bidirectional WebRTC connection** between two terminals, a
 #### 🍺 **Homebrew (macOS)** ⭐ **Recommended**
 
 **Official Homebrew Tap:**
+
 ```bash
 # Add the tap and install
 brew tap saswatsam786/snapshell
@@ -73,6 +74,7 @@ snapshell --help
 ```
 
 **Alternative - Local Formula:**
+
 ```bash
 # Clone repository and install locally
 git clone https://github.com/saswatsam786/snapshell.git
@@ -81,6 +83,7 @@ brew install --build-from-source --HEAD --formula ./Formula/snapshell.rb
 ```
 
 **Manual Dependencies + Build:**
+
 ```bash
 # Install dependencies via Homebrew
 brew install opencv pkg-config go
@@ -122,6 +125,69 @@ go build -o signaler cmd/signaler/main.go
 
 # Ready to use!
 ./snapshell --help
+```
+
+## 🔧 Troubleshooting
+
+### macOS Command Line Tools Issue
+
+If you get an error about outdated Command Line Tools during Homebrew installation:
+
+```
+Error: Your Command Line Tools are too outdated.
+Update them from Software Update in System Settings.
+```
+
+**Solution:**
+
+```bash
+# Option 1: Update via System Settings
+# Go to System Settings > General > Software Update
+
+# Option 2: Manual update (if System Settings doesn't show updates)
+sudo rm -rf /Library/Developer/CommandLineTools
+sudo xcode-select --install
+
+# Option 3: Download manually from Apple
+# Visit: https://developer.apple.com/download/all/
+# Download "Command Line Tools for Xcode 16.2" or latest version
+```
+
+After updating Command Line Tools, try the installation again:
+
+```bash
+brew install --HEAD snapshell
+```
+
+### OpenCV Issues
+
+If you encounter OpenCV-related build errors:
+
+```bash
+# Reinstall OpenCV
+brew uninstall opencv
+brew install opencv
+
+# Verify pkg-config can find OpenCV
+pkg-config --modversion opencv4
+
+# Try installation again
+brew install --HEAD snapshell
+```
+
+### General Build Issues
+
+If the build fails:
+
+```bash
+# Clean Homebrew cache
+brew cleanup
+
+# Update Homebrew
+brew update
+
+# Try installation with verbose output
+brew install --HEAD snapshell --verbose
 ```
 
 ## 🎮 Usage Modes
