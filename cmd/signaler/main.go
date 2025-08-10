@@ -1,3 +1,6 @@
+// SnapShell Signaling Server
+// Made with ❤️ by Saswat Samal (https://github.com/saswatsam786)
+// License: MIT
 package main
 
 import (

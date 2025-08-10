@@ -1,3 +1,6 @@
+// SnapShell CLI
+// Made with ❤️ by Saswat Samal (https://github.com/saswatsam786)
+// License: MIT
 package main
 
 import (
@@ -67,6 +70,8 @@ func main() {
 		fmt.Println("    snapshell -a          # Manual answerer")
 		fmt.Println("")
 		fmt.Printf("  Current signaling server: %s\n", getDefaultServer())
+		fmt.Println("")
+		fmt.Println("  Made with ❤️ by Saswat Samal (https://github.com/saswatsam786)")
 		os.Exit(1)
 	}
 }
