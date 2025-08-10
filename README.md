@@ -2,6 +2,8 @@
 
 A **real-time WebRTC-based terminal video sharing application** built with Go. SnapShell enables peer-to-peer webcam streaming with unique ASCII art rendering directly in your terminal - no GUI required!
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ## 🎯 What SnapShell Does
 
 SnapShell creates a **bidirectional WebRTC connection** between two terminals, allowing real-time webcam feed sharing with ASCII art conversion. Think of it as "video calling for terminals" - perfect for remote pair programming, terminal demos, or just having fun with ASCII video art.
@@ -484,3 +486,5 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ---
 
 **SnapShell** - Where retro meets real-time. Happy ASCII streaming! 🎥📺
+
+Made with ❤️ by Saswat Samal
