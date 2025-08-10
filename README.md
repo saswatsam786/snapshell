@@ -129,6 +129,16 @@ go build -o signaler cmd/signaler/main.go
 
 ## 🔧 Troubleshooting
 
+### Render Server Startup Delay
+
+**Issue:** Connection to `https://snapshell.onrender.com` fails or times out.
+
+**Cause:** Render services automatically suspend after periods of inactivity to save resources.
+
+**Solution:** Wait 1-2 minutes for the service to start up, then try again. The server will respond once fully initialized.
+
+**Future:** We will migrate to AWS for better reliability and performance, eliminating these startup delays.
+
 ### macOS Command Line Tools Issue
 
 If you get an error about outdated Command Line Tools during Homebrew installation:
@@ -195,6 +205,8 @@ brew install --HEAD snapshell --verbose
 ### 1. 🌐 Production Server Mode (Recommended)
 
 **Use our deployed signaling server - no setup required!**
+
+> **⚠️ Note:** The Redis signaling server is deployed on Render. Render services may take 1-2 minutes to start up if they've been inactive for a while (they automatically suspend after periods of inactivity to save resources). If you encounter connection issues, wait a few minutes and try again. **Note: We will soon migrate to AWS for better reliability and performance.**
 
 **Terminal 1 - First User (Caller):**
 
