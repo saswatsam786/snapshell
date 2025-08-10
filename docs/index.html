@@ -1,156 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SnapShell - Terminal Video Sharing</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Monaco', 'Menlo', monospace; 
-            background: #0d1117; 
-            color: #c9d1d9; 
-            line-height: 1.6;
-        }
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        h1 { 
-            font-size: 3em; 
-            text-align: center; 
-            margin-bottom: 0.5em;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .subtitle { 
-            text-align: center; 
-            font-size: 1.2em; 
-            margin-bottom: 2em; 
-            color: #7c3aed;
-        }
-        .terminal {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-            font-family: 'Monaco', monospace;
-        }
-        .install-cmd {
-            background: #238636;
-            color: white;
-            padding: 15px;
-            border-radius: 5px;
-            font-family: monospace;
-            margin: 10px 0;
-            overflow-x: auto;
-        }
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-        .feature {
-            background: #21262d;
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #7c3aed;
-        }
-        .demo-ascii {
-            font-family: monospace;
-            background: #000;
-            color: #0f0;
-            padding: 20px;
-            border-radius: 5px;
-            text-align: center;
-            margin: 20px 0;
-            white-space: pre-line;
-        }
-        .cta {
-            text-align: center;
-            margin: 40px 0;
-        }
-        .btn {
-            display: inline-block;
-            background: #7c3aed;
-            color: white;
-            padding: 12px 24px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin: 0 10px;
-            transition: background 0.3s;
-        }
-        .btn:hover { background: #5b21b6; }
-        .footer {
-            text-align: center;
-            margin-top: 50px;
-            color: #8b949e;
-            border-top: 1px solid #30363d;
-            padding-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SnapShell • Terminal Video Chat (WebRTC + ASCII)</title>
+  <meta name="description" content="SnapShell is a real-time terminal video chat using WebRTC with ASCII rendering. Cross-platform CLI. Brew install and one-line Linux script.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0d1117;--panel:#0f1522;--muted:#8b949e;--text:#c9d1d9;--brand:#7c3aed;--brand-2:#4ecdc4;--border:#30363d;--ok:#238636;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
+    a{color:inherit}
+    .container{max-width:1080px;margin:0 auto;padding:24px}
+
+    /* Hero */
+    .hero{position:relative;overflow:hidden;border:1px solid var(--border);border-radius:14px;background:radial-gradient(1200px 600px at 10% 0%, rgba(124,58,237,.15), transparent), radial-gradient(900px 500px at 100% 20%, rgba(78,205,196,.1), transparent), var(--panel);padding:48px;box-shadow:var(--shadow)}
+    .hero-title{font-size:48px;line-height:1.05;margin:0 0 10px;font-weight:800;letter-spacing:-.02em;background:linear-gradient(45deg,var(--brand),var(--brand-2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .hero-sub{margin:0;color:var(--muted);font-size:18px}
+    .hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+    .btn{display:inline-flex;align-items:center;gap:10px;background:var(--brand);border:none;color:white;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:600;box-shadow:var(--shadow);transition:transform .08s ease, background .2s}
+    .btn:hover{transform:translateY(-1px);background:#6d28d9}
+    .btn.alt{background:transparent;color:var(--text);border:1px solid var(--border)}
+
+    /* Grids */
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:28px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}.hero{padding:28px}}
+
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:var(--shadow)}
+    .card h3{margin:0 0 8px;font-size:18px}
+    .muted{color:var(--muted)}
+
+    /* Code/Terminal */
+    .term{background:#0b0f16;border:1px solid var(--border);border-radius:12px;padding:16px;font-family:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;font-size:13px;overflow:auto}
+    .install{display:grid;grid-template-columns:1fr;gap:10px}
+    .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:rgba(124,58,237,.12);padding:6px 10px;border-radius:999px;font-size:12px;color:#cdb9ff}
+
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    @media (max-width:900px){.features{grid-template-columns:1fr}}
+    .feature{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--brand);border-radius:10px;padding:16px}
+    .feature h4{margin:0 0 6px}
+
+    .ascii{background:#000;color:#0f0;border-radius:10px;border:1px solid #0f0;padding:16px;font-family:"JetBrains Mono", monospace;font-size:12px;white-space:pre;overflow:auto}
+
+    .note{margin-top:12px;font-size:13px;color:var(--muted)}
+
+    .footer{margin:36px 0 12px;text-align:center;color:var(--muted)}
+    .footer a{color:#a78bfa}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>📸 SnapShell</h1>
-        <p class="subtitle">Real-time ASCII video sharing in your terminal</p>
-        
-        <div class="terminal">
-            <h2>🚀 Quick Install</h2>
-            <div class="install-cmd">
-                curl -sSL https://raw.githubusercontent.com/saswatsam786/snapshell/main/install.sh | bash
-            </div>
-        </div>
+  <div class="container">
 
-        <div class="demo-ascii">
-██╗  ██╗███████╗██╗     ██╗      ██████╗ 
+    <section class="hero">
+      <div class="chip">WebRTC • CLI • ASCII</div>
+      <h1 class="hero-title">SnapShell — Real‑time Terminal Video Chat</h1>
+      <p class="hero-sub">Peer‑to‑peer video chat rendered as ASCII directly in your terminal. Minimal latency. No GUI. Just vibes.</p>
+      <div class="hero-cta">
+        <a class="btn" href="https://github.com/saswatsam786/snapshell">⭐ Star on GitHub</a>
+        <a class="btn alt" href="#install">Install</a>
+        <a class="btn alt" href="#usage">Usage</a>
+      </div>
+    </section>
+
+    <section id="install" class="grid">
+      <div class="card">
+        <h3>🍺 Install (macOS via Homebrew)</h3>
+        <p class="muted">Official tap</p>
+        <div class="term">
+          brew tap saswatsam786/snapshell
+          <br/>brew install --HEAD snapshell
+        </div>
+        <p class="note">Requires up‑to‑date Xcode Command Line Tools. If Homebrew complains they are outdated, reinstall with <code>xcode-select --install</code>.</p>
+      </div>
+      <div class="card">
+        <h3>🐧 Quick Install (Linux)</h3>
+        <p class="muted">One‑liner script</p>
+        <div class="term">curl -sSL https://raw.githubusercontent.com/saswatsam786/snapshell/main/install.sh | bash</div>
+        <p class="note">Binary builds are provided for Linux. For macOS use Homebrew. Windows via WSL recommended.</p>
+      </div>
+    </section>
+
+    <section class="grid" id="usage">
+      <div class="card">
+        <h3>🎮 Usage — Production Signaling</h3>
+        <div class="term">
+          # Caller (offerer)
+          <br/>snapshell -signaled-o --room demo123 --server https://snapshell.onrender.com
+          <br/><br/># Answerer (callee)
+          <br/>snapshell -signaled-a --room demo123 --server https://snapshell.onrender.com
+        </div>
+        <p class="note">Note: Signaling is hosted on Render. Cold starts may take ~1–2 minutes after inactivity. We plan to migrate to AWS for improved uptime and latency.</p>
+      </div>
+      <div class="card">
+        <h3>🧪 Local Dev — File/Manual</h3>
+        <div class="term">
+          # File‑based signaling (auto)
+          <br/>snapshell -auto-o  # in one terminal
+          <br/>snapshell -auto-a  # in another
+          <br/><br/># Manual mode (copy/paste SDP)
+          <br/>snapshell -o  /  snapshell -a
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h3>🖼 Live ASCII Preview</h3>
+        <div class="ascii">██╗  ██╗███████╗██╗     ██╗      ██████╗
 ██║  ██║██╔════╝██║     ██║     ██╔═══██╗
 ███████║█████╗  ██║     ██║     ██║   ██║
 ██╔══██║██╔══╝  ██║     ██║     ██║   ██║
 ██║  ██║███████╗███████╗███████╗╚██████╔╝
-╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝ ╚═════╝ 
-        Live ASCII Video Feed!
+╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝ ╚═════╝
         </div>
+      </div>
+      <div class="card">
+        <h3>🔩 How it Works</h3>
+        <p class="muted">P2P via WebRTC (Pion). ASCII conversion with OpenCV. Signaling via Redis + HTTP/SSE.</p>
+        <ul class="muted" style="margin:8px 0 0 18px;line-height:1.6">
+          <li>Direct peer connection with ICE/STUN</li>
+          <li>Bi‑directional video streams rendered as ASCII</li>
+          <li>Adaptive sizing to terminal dimensions</li>
+        </ul>
+      </div>
+    </section>
 
-        <div class="features">
-            <div class="feature">
-                <h3>🎥 Real-time Video</h3>
-                <p>Share webcam feed as beautiful ASCII art in real-time with WebRTC technology</p>
-            </div>
-            <div class="feature">
-                <h3>🖥️ Terminal Native</h3>
-                <p>Works in any terminal, SSH session, or console. No GUI required!</p>
-            </div>
-            <div class="feature">
-                <h3>⚡ Ultra Low Latency</h3>
-                <p>Direct peer-to-peer connections with ~100-200ms latency</p>
-            </div>
-            <div class="feature">
-                <h3>🌍 Cross Platform</h3>
-                <p>Linux, macOS, Windows support with one-line installation</p>
-            </div>
-        </div>
+    <section class="features">
+      <div class="feature"><h4>⚡ Low Latency</h4><p class="muted">~100–200ms including capture and ASCII conversion</p></div>
+      <div class="feature"><h4>🧰 Dev‑Friendly</h4><p class="muted">CLI‑first UX, great for demos, SSH and pair programming</p></div>
+      <div class="feature"><h4>🌍 Cross‑platform</h4><p class="muted">macOS (Brew), Linux (script). Windows via WSL</p></div>
+    </section>
 
-        <div class="terminal">
-            <h2>🎮 Usage</h2>
-            <p><strong>Start a video session:</strong></p>
-            <div style="margin: 10px 0; font-family: monospace;">
-                # Caller (video sender)<br>
-                snapshell -signaled-o --room demo123 --server https://snapshell.onrender.com<br><br>
-                # Answerer (video receiver)<br>
-                snapshell -signaled-a --room demo123 --server https://snapshell.onrender.com
-            </div>
+    <div class="grid" style="margin-top:20px">
+      <div class="card">
+        <h3>📦 Download / Source</h3>
+        <div class="hero-cta" style="margin-top:12px">
+          <a class="btn" href="https://github.com/saswatsam786/snapshell">View on GitHub</a>
+          <a class="btn alt" href="https://github.com/saswatsam786/snapshell/releases">Releases</a>
+          <a class="btn alt" href="https://pkg.go.dev/github.com/saswatsam786/snapshell">Go pkg docs</a>
         </div>
-
-        <div class="cta">
-            <a href="https://github.com/saswatsam786/snapshell" class="btn">📖 View on GitHub</a>
-            <a href="https://github.com/saswatsam786/snapshell/releases" class="btn">📦 Download Binary</a>
-        </div>
-
-        <div class="footer">
-            <p>Made with ❤️ by <a href="https://github.com/saswatsam786" style="color: #7c3aed;">Saswat Samal</a></p>
-            <p>Open source • MIT License • WebRTC powered</p>
-        </div>
+      </div>
+      <div class="card">
+        <h3>📄 License & Credits</h3>
+        <p class="muted">Open‑source under MIT. Made with ❤️ by <a href="https://github.com/saswatsam786">Saswat Samal</a>.</p>
+      </div>
     </div>
+
+    <footer class="footer">
+      <p>SnapShell — Where retro meets real‑time.</p>
+    </footer>
+  </div>
 </body>
 </html>
