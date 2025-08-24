@@ -3,8 +3,12 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
   workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
 
 jobs:
   # Simple release job that doesn't require building
@@ -101,7 +105,7 @@ jobs:
           # Update the formula to point to the new tag instead of head
           sed -i "s|head \"https://github.com/saswatsam786/snapshell.git\", branch: \"main\"|url \"https://github.com/saswatsam786/snapshell/archive/${GITHUB_REF#refs/tags/}.tar.gz\"|" Formula/snapshell.rb
           sed -i "s|head \"https://github.com/saswatsam786/snapshell.git\", branch: \"main\"|version \"${{ steps.get_version.outputs.VERSION }}\"|" Formula/snapshell.rb
-          
+
           # Add sha256 calculation (this would need to be updated manually or via API)
           echo "# Note: sha256 needs to be calculated and updated manually for now"
 
