@@ -16,6 +16,16 @@ func CreatePeerConnection() (*webrtc.PeerConnection, error) {
 	return pc, nil
 }
 
+// New helper that allows custom ICE servers (from Twilio)
+func CreatePeerConnectionWithServers(ice []webrtc.ICEServer) (*webrtc.PeerConnection, error) {
+	cfg := webrtc.Configuration{ICEServers: ice}
+	pc, err := webrtc.NewPeerConnection(cfg)
+	if err != nil {
+		return nil, err
+	}
+	return pc, nil
+}
+
 // Encode an SDP structure into base64 for manual exchange
 func Encode(obj interface{}) (string, error) {
 	b, err := json.Marshal(obj)

@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/pion/webrtc/v4"
 )
 
 type Client struct {
@@ -134,4 +136,39 @@ func (c *Client) SubscribeICE(to string, onCand func(string)) (*http.Response, e
 		resp.Body.Close()
 	}()
 	return resp, nil
+}
+
+func (c *Client) FetchICEServers() ([]webrtc.ICEServer, error) {
+	resp, err := c.HC.Get(c.Base + "/ice")
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	var out struct {
+		IceServers []struct {
+			URLs       []string `json:"urls"`
+			Username   string   `json:"username,omitempty"`
+			Credential string   `json:"credential,omitempty"`
+		} `json:"ice_servers"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&out); err != nil {
+		return nil, err
+	}
+
+	servers := make([]webrtc.ICEServer, 0, len(out.IceServers))
+	for _, s := range out.IceServers {
+		if len(s.URLs) == 0 {
+			continue
+		}
+
+		servers = append(servers, webrtc.ICEServer{
+			URLs:       s.URLs,
+			Username:   s.Username,
+			Credential: s.Credential,
+		})
+	}
+	return servers, nil
 }

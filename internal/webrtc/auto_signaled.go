@@ -45,7 +45,13 @@ func RunAutoOfferSignaled(server, room, clientID string) {
 		log.Fatalf("room %s already assigned offer to someone else (you got %q). Start as -auto-a instead.", room, role)
 	}
 
-	pc, err := CreatePeerConnection()
+	ice, err := sg.FetchICEServers()
+
+	if err != nil || len(ice) == 0 {
+		ice = []webrtc.ICEServer{{URLs: []string{"stun:stun.l.google.com:19302"}}}
+	}
+
+	pc, err := CreatePeerConnectionWithServers(ice)
 	if err != nil {
 		log.Fatal(err)
 	}

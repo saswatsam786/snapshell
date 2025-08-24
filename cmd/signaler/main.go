@@ -9,8 +9,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 	"golang.org/x/net/context"
 )
@@ -251,7 +253,135 @@ func streamICE(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GET /ice -> returns { "ice_servers": [ {urls, username, credential}, ... ] }
+func getICEServers(w http.ResponseWriter, r *http.Request) {
+	type iceOut struct {
+		ICEServers []struct {
+			URLs       []string `json:"urls"`
+			Username   string   `json:"username,omitempty"`
+			Credential string   `json:"credential,omitempty"`
+		} `json:"ice_servers"`
+	}
+
+	type twilioToken struct {
+		ICEServers []struct {
+			URL        string      `json:"url"`  // sometimes present
+			URLs       interface{} `json:"urls"` // string or []string
+			Username   string      `json:"username,omitempty"`
+			Credential string      `json:"credential,omitempty"`
+		} `json:"ice_servers"`
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	sid := os.Getenv("TWILIO_SID")
+	auth := os.Getenv("TWILIO_AUTH")
+
+	// Try Twilio first (if creds are set)
+	if sid != "" && auth != "" {
+		req, err := http.NewRequest(
+			"POST",
+			fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%s/Tokens.json", sid),
+			strings.NewReader(""), // no body required
+		)
+		if err == nil {
+			req.SetBasicAuth(sid, auth)
+			// Twilio expects form content-type even with empty body
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+			resp, err := http.DefaultClient.Do(req)
+			if err == nil {
+				defer resp.Body.Close()
+				if resp.StatusCode/100 == 2 {
+					var tw twilioToken
+					if err := json.NewDecoder(resp.Body).Decode(&tw); err == nil {
+						out := iceOut{}
+						for _, s := range tw.ICEServers {
+							// normalize urls -> []string
+							var urls []string
+							switch v := s.URLs.(type) {
+							case string:
+								if v != "" {
+									urls = []string{v}
+								}
+							case []interface{}:
+								for _, anyu := range v {
+									if us, ok := anyu.(string); ok && us != "" {
+										urls = append(urls, us)
+									}
+								}
+							case []string:
+								if len(v) > 0 {
+									urls = append(urls, v...)
+								}
+							default:
+								// fallback to "url" if "urls" not usable
+								if s.URL != "" {
+									urls = []string{s.URL}
+								}
+							}
+							if len(urls) == 0 && s.URL != "" {
+								urls = []string{s.URL}
+							}
+							if len(urls) == 0 {
+								continue
+							}
+
+							out.ICEServers = append(out.ICEServers, struct {
+								URLs       []string `json:"urls"`
+								Username   string   `json:"username,omitempty"`
+								Credential string   `json:"credential,omitempty"`
+							}{
+								URLs:       urls,
+								Username:   s.Username,
+								Credential: s.Credential,
+							})
+						}
+
+						// ✅ Return exactly one JSON object
+						_ = json.NewEncoder(w).Encode(out)
+						return
+					}
+				} else {
+					// Non-2xx from Twilio — fall through to fallback below
+				}
+			}
+		}
+	}
+
+	// Fallback: public STUN + optional static TURN from env
+	out := iceOut{
+		ICEServers: []struct {
+			URLs       []string `json:"urls"`
+			Username   string   `json:"username,omitempty"`
+			Credential string   `json:"credential,omitempty"`
+		}{
+			{URLs: []string{"stun:stun.l.google.com:19302"}},
+		},
+	}
+
+	// Optional static TURN (if you set envs)
+	if u := os.Getenv("TURN_URLS"); u != "" {
+		out.ICEServers = append(out.ICEServers, struct {
+			URLs       []string `json:"urls"`
+			Username   string   `json:"username,omitempty"`
+			Credential string   `json:"credential,omitempty"`
+		}{
+			URLs:       strings.Split(u, ","),
+			Username:   os.Getenv("TURN_USERNAME"),
+			Credential: os.Getenv("TURN_PASSWORD"),
+		})
+	}
+
+	_ = json.NewEncoder(w).Encode(out)
+}
+
 func main() {
+	// Load environment variables from .env.development
+	if err := godotenv.Load(".env.development"); err != nil {
+		log.Printf("Warning: Could not load .env.development: %v", err)
+	}
+
 	// REDIS_URL like: redis://:password@host:6379/0  (or leave empty for localhost)
 	redisAddr := "127.0.0.1:6379"
 	if env := os.Getenv("REDIS_ADDR"); env != "" {
@@ -312,6 +442,7 @@ func main() {
 	mux.HandleFunc("GET /room/{id}/answer", getAnswer)
 	mux.HandleFunc("POST /room/{id}/ice", postICE)
 	mux.HandleFunc("GET /room/{id}/ice", streamICE)
+	mux.HandleFunc("GET /ice", getICEServers)
 
 	addr := ":8080"
 	if port := os.Getenv("PORT"); port != "" {

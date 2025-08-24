@@ -21,10 +21,6 @@ func getDefaultServer() string {
 }
 
 func main() {
-	offer := flag.Bool("o", false, "Start as offerer (caller) - manual mode")
-	answer := flag.Bool("a", false, "Start as answerer (callee) - manual mode")
-	autoOffer := flag.Bool("auto-o", false, "Start as offerer (caller) - auto mode (file signaling)")
-	autoAnswer := flag.Bool("auto-a", false, "Start as answerer (callee) - auto mode (file signaling)")
 	autoOfferSignaled := flag.Bool("signaled-o", false, "Start as offerer (caller) - signaling server mode")
 	autoAnswerSignaled := flag.Bool("signaled-a", false, "Start as answerer (callee) - signaling server mode")
 	server := flag.String("server", getDefaultServer(), "Signaling server base URL (default: SNAPSHELL_SERVER env var or http://localhost:8080)")
@@ -44,18 +40,6 @@ func main() {
 	} else if *autoAnswerSignaled {
 		fmt.Println("Running as auto callee (signaling server)...")
 		webrtc.RunAutoAnswerSignaled(*server, *room, *clientID)
-	} else if *autoOffer {
-		fmt.Println("Running as auto caller (file signaling)...")
-		webrtc.RunAutoOffer()
-	} else if *autoAnswer {
-		fmt.Println("Running as auto callee (file signaling)...")
-		webrtc.RunAutoAnswer()
-	} else if *offer {
-		fmt.Println("Running as caller (manual mode)...")
-		webrtc.RunOffer()
-	} else if *answer {
-		fmt.Println("Running as callee (manual mode)...")
-		webrtc.RunAnswer()
 	} else {
 		fmt.Println("Usage:")
 		fmt.Println("  Signaling server mode (recommended):")

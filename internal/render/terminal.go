@@ -32,7 +32,7 @@ func HideCursor() {
 
 // ShowCursor shows the terminal cursor
 func ShowCursor() {
-	fmt.Print("\033[?25l")
+	fmt.Print("\033[?25h")
 }
 
 // GetTerminalSize gets the current terminal size
