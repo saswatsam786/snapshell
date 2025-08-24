@@ -11,109 +11,14 @@ permissions:
   packages: write
 
 jobs:
-  # Build SnapShell for multiple platforms
-  build:
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-
-    strategy:
-      matrix:
-        include:
-          - os: linux
-            arch: amd64
-            goos: linux
-            goarch: amd64
-            binary_name: snapshell-linux-amd64
-          - os: linux
-            arch: arm64
-            goos: linux
-            goarch: arm64
-            binary_name: snapshell-linux-arm64
-          - os: macos
-            arch: amd64
-            goos: darwin
-            goarch: amd64
-            binary_name: snapshell-macos-amd64
-          - os: macos
-            arch: arm64
-            goos: darwin
-            goarch: arm64
-            binary_name: snapshell-macos-arm64
-          - os: windows
-            arch: amd64
-            goos: windows
-            goarch: amd64
-            binary_name: snapshell-windows-amd64.exe
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: "1.21"
-
-      - name: Build SnapShell
-        env:
-          GOOS: ${{ matrix.goos }}
-          GOARCH: ${{ matrix.goarch }}
-          CGO_ENABLED: 1
-        run: |
-          echo "Building for ${{ matrix.os }} ${{ matrix.arch }}..."
-          echo "GOOS=$GOOS, GOARCH=$GOARCH, CGO_ENABLED=$CGO_ENABLED"
-          
-          # For Linux builds, we need to handle CGO dependencies
-          if [ "$GOOS" = "linux" ]; then
-            echo "Installing Linux build dependencies..."
-            sudo apt-get update
-            sudo apt-get install -y gcc libc6-dev
-          fi
-          
-          # Try building with CGO first
-          echo "Attempting build with CGO enabled..."
-          if go build -ldflags="-s -w" -o ${{ matrix.binary_name }} ./cmd/main.go; then
-            echo "✅ Build successful with CGO: ${{ matrix.binary_name }}"
-          else
-            echo "⚠️ CGO build failed, trying without CGO..."
-            # Fallback to CGO disabled for cross-compilation
-            CGO_ENABLED=0 go build -ldflags="-s -w" -o ${{ matrix.binary_name }} ./cmd/main.go
-            if [ $? -eq 0 ]; then
-              echo "✅ Build successful without CGO: ${{ matrix.binary_name }}"
-            else
-              echo "❌ Build failed completely"
-              exit 1
-            fi
-          fi
-          
-          # Verify the binary was created
-          if [ -f "${{ matrix.binary_name }}" ]; then
-            echo "✅ Build successful: ${{ matrix.binary_name }}"
-            ls -la ${{ matrix.binary_name }}
-            file ${{ matrix.binary_name }}
-          else
-            echo "❌ Build failed: ${{ matrix.binary_name }} not found"
-            exit 1
-          fi
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.binary_name }}
-          path: ${{ matrix.binary_name }}
-
-  # Create GitHub release with built binaries
+  # Simple release job that doesn't require building
   release:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
-    needs: build
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Download all build artifacts
-        uses: actions/download-artifact@v4
 
       - name: Get version from tag
         id: get_version
@@ -186,12 +91,6 @@ jobs:
             - **Added ICETransportPolicyRelay** for better relay candidate handling
             - **Improved WebRTC connection reliability** across different network configurations
             - **Better support for corporate networks** and mobile networks
-          files: |
-            snapshell-linux-amd64
-            snapshell-linux-arm64
-            snapshell-macos-amd64
-            snapshell-macos-arm64
-            snapshell-windows-amd64.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
