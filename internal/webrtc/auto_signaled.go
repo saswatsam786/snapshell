@@ -51,7 +51,7 @@ func RunAutoOfferSignaled(server, room, clientID string) {
 		ice = []webrtc.ICEServer{{URLs: []string{"stun:stun.l.google.com:19302"}}}
 	}
 
-	pc, err := CreatePeerConnectionWithServers(ice)
+	pc, err := CreatePeerConnectionWithFallback(ice)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -186,7 +186,12 @@ func RunAutoAnswerSignaled(server, room, clientID string) {
 		log.Fatalf("room %s expects you as answer; server gave role %q. Start as -auto-o if you're first.", room, role)
 	}
 
-	pc, err := CreatePeerConnection()
+	ice, err := sg.FetchICEServers()
+	if err != nil || len(ice) == 0 {
+		ice = []webrtc.ICEServer{{URLs: []string{"stun:stun.l.google.com:19302"}}}
+	}
+
+	pc, err := CreatePeerConnectionWithFallback(ice)
 	if err != nil {
 		log.Fatal(err)
 	}

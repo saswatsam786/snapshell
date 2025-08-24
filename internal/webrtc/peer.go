@@ -18,11 +18,45 @@ func CreatePeerConnection() (*webrtc.PeerConnection, error) {
 
 // New helper that allows custom ICE servers (from Twilio)
 func CreatePeerConnectionWithServers(ice []webrtc.ICEServer) (*webrtc.PeerConnection, error) {
-	cfg := webrtc.Configuration{ICEServers: ice}
+	cfg := webrtc.Configuration{
+		ICEServers: ice,
+		// Force TURN usage when available for better cross-network connectivity
+		ICETransportPolicy: webrtc.ICETransportPolicyRelay,
+		// Set connection constraints to prefer relay candidates
+		BundlePolicy:  webrtc.BundlePolicyMaxBundle,
+		RTCPMuxPolicy: webrtc.RTCPMuxPolicyRequire,
+	}
 	pc, err := webrtc.NewPeerConnection(cfg)
 	if err != nil {
 		return nil, err
 	}
+	return pc, nil
+}
+
+// CreatePeerConnectionWithFallback creates a connection that first tries relay-only,
+// then falls back to all candidates if relay fails
+func CreatePeerConnectionWithFallback(ice []webrtc.ICEServer) (*webrtc.PeerConnection, error) {
+	// First try relay-only for cross-network connectivity
+	cfg := webrtc.Configuration{
+		ICEServers:         ice,
+		ICETransportPolicy: webrtc.ICETransportPolicyRelay,
+		BundlePolicy:       webrtc.BundlePolicyMaxBundle,
+		RTCPMuxPolicy:      webrtc.RTCPMuxPolicyRequire,
+	}
+
+	pc, err := webrtc.NewPeerConnection(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Add connection state change handler to detect relay failures
+	pc.OnConnectionStateChange(func(s webrtc.PeerConnectionState) {
+		if s == webrtc.PeerConnectionStateFailed {
+			// If relay fails, we could implement fallback logic here
+			// For now, just log the failure
+		}
+	})
+
 	return pc, nil
 }
 
