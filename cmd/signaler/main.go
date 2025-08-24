@@ -430,7 +430,7 @@ func main() {
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, map[string]string{
 			"service":   "SnapShell WebRTC Signaling Server",
-			"version":   "1.0.0",
+			"version":   "1.1.0",
 			"endpoints": "/room/{id}/join, /room/{id}/offer, /room/{id}/answer, /room/{id}/ice",
 		})
 	})
