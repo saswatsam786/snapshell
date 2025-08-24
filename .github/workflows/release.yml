@@ -11,14 +11,77 @@ permissions:
   packages: write
 
 jobs:
-  # Simple release job that doesn't require building
-  release:
+  # Build SnapShell for multiple platforms
+  build:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
+    
+    strategy:
+      matrix:
+        include:
+          - os: linux
+            arch: amd64
+            goos: linux
+            goarch: amd64
+            binary_name: snapshell-linux-amd64
+          - os: linux
+            arch: arm64
+            goos: linux
+            goarch: arm64
+            binary_name: snapshell-linux-arm64
+          - os: macos
+            arch: amd64
+            goos: darwin
+            goarch: amd64
+            binary_name: snapshell-macos-amd64
+          - os: macos
+            arch: arm64
+            goos: darwin
+            goarch: arm64
+            binary_name: snapshell-macos-arm64
+          - os: windows
+            arch: amd64
+            goos: windows
+            goarch: amd64
+            binary_name: snapshell-windows-amd64.exe
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Build SnapShell
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 1
+        run: |
+          echo "Building for ${{ matrix.os }} ${{ matrix.arch }}..."
+          go build -ldflags="-s -w" -o ${{ matrix.binary_name }} ./cmd/main.go
+          ls -la ${{ matrix.binary_name }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.binary_name }}
+          path: ${{ matrix.binary_name }}
+
+  # Create GitHub release with built binaries
+  release:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v3
 
       - name: Get version from tag
         id: get_version
@@ -34,7 +97,10 @@ jobs:
 
             ## 🚀 What's New
 
-            This release includes TURN server integration and improved WebRTC connectivity.
+            This release includes **improved cross-network WebRTC connectivity** with TURN-first policy:
+            - **TURN server prioritization** for better cross-network connections
+            - **Improved ICE candidate handling** with relay-first approach
+            - **Better connectivity** across corporate networks, mobile networks, and different ISPs
 
             ## 📦 Installation
 
@@ -66,6 +132,7 @@ jobs:
 
             - **WebRTC Video Sharing**: Real-time webcam to ASCII art conversion
             - **TURN Server Support**: Improved connectivity with Twilio TURN servers
+            - **Cross-Network Support**: Better connectivity between different networks
             - **Signaling Server**: WebRTC signaling for peer-to-peer connections
             - **Cross-platform**: Works on macOS, Linux, and Windows
 
@@ -80,6 +147,19 @@ jobs:
             - [Homepage](https://saswatsam786.github.io/snapshell/)
             - [Documentation](https://github.com/saswatsam786/snapshell)
             - [Homebrew Tap](https://github.com/saswatsam786/homebrew-snapshell)
+
+            ## 🆕 Changes in v1.2.0
+
+            - **Fixed cross-network connectivity** by prioritizing TURN servers
+            - **Added ICETransportPolicyRelay** for better relay candidate handling
+            - **Improved WebRTC connection reliability** across different network configurations
+            - **Better support for corporate networks** and mobile networks
+          files: |
+            snapshell-linux-amd64
+            snapshell-linux-arm64
+            snapshell-macos-amd64
+            snapshell-macos-arm64
+            snapshell-windows-amd64.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
