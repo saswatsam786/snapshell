@@ -1,86 +1,114 @@
 name: Build and Release
 
 on:
-  # Disabled due to OpenCV compilation issues
-  # Use Homebrew formula instead: Formula/snapshell.rb
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: "1.21"
-
-      - name: Install OpenCV dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libopencv-dev libopencv-contrib-dev pkg-config
-
-      - name: Build Linux AMD64
-        env:
-          CGO_ENABLED: 1
-          GOOS: linux
-          GOARCH: amd64
-        run: |
-          go build -ldflags="-s -w" -o snapshell-linux-amd64 cmd/main.go
-
-      - name: Upload Linux artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: snapshell-linux-amd64
-          path: snapshell-linux-amd64
-
+  # Simple release job that doesn't require building
   release:
-    needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
 
     steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-          pattern: snapshell-*
-          merge-multiple: true
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            artifacts/snapshell-*
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          name: SnapShell ${{ steps.get_version.outputs.VERSION }}
           body: |
-            # SnapShell Release
+            # SnapShell Release ${{ steps.get_version.outputs.VERSION }}
 
-            ## Quick Install (Linux/macOS)
+            ## 🚀 What's New
 
+            This release includes TURN server integration and improved WebRTC connectivity.
+
+            ## 📦 Installation
+
+            ### Homebrew (Recommended)
             ```bash
-            curl -sSL https://raw.githubusercontent.com/saswatsam786/snapshell/main/install.sh | bash
+            brew tap saswatsam786/snapshell
+            brew install snapshell
             ```
 
-            ## Manual Download
+            ### Manual Build
+            ```bash
+            # Clone and build locally
+            git clone https://github.com/saswatsam786/snapshell.git
+            cd snapshell
+            go build ./cmd/main.go
+            ```
 
-            - **Linux**: `snapshell-linux-amd64`
-
-            ## Usage
+            ## 🎯 Usage
 
             ```bash
-            # Make executable 
-            chmod +x snapshell-linux-amd64
-
             # Start video session (offerer)
-            ./snapshell-linux-amd64 -signaled-o --room demo123 --server https://snapshell.onrender.com
+            snapshell -signaled-o --room demo123 --server https://snapshell.onrender.com
 
             # Join video session (answerer) 
-            ./snapshell-linux-amd64 -signaled-a --room demo123 --server https://snapshell.onrender.com
+            snapshell -signaled-a --room demo123 --server https://snapshell.onrender.com
             ```
 
-            ## About
+            ## 🔧 Features
 
-            SnapShell converts live webcam video to ASCII art in real-time and shares it through WebRTC peer-to-peer connections. Perfect for terminal-based video sharing!
+            - **WebRTC Video Sharing**: Real-time webcam to ASCII art conversion
+            - **TURN Server Support**: Improved connectivity with Twilio TURN servers
+            - **Signaling Server**: WebRTC signaling for peer-to-peer connections
+            - **Cross-platform**: Works on macOS, Linux, and Windows
+
+            ## 📋 Requirements
+
+            - Go 1.21+
+            - OpenCV (automatically installed via Homebrew)
+            - Webcam access
+
+            ## 🔗 Links
+
+            - [Homepage](https://saswatsam786.github.io/snapshell/)
+            - [Documentation](https://github.com/saswatsam786/snapshell)
+            - [Homebrew Tap](https://github.com/saswatsam786/homebrew-snapshell)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Update Homebrew formula when new tags are pushed
+  update-homebrew:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: release
+
+    steps:
+      - name: Checkout homebrew-snapshell
+        uses: actions/checkout@v4
+        with:
+          repository: saswatsam786/homebrew-snapshell
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Update formula version
+        run: |
+          # Update the formula to point to the new tag instead of head
+          sed -i "s|head \"https://github.com/saswatsam786/snapshell.git\", branch: \"main\"|url \"https://github.com/saswatsam786/snapshell/archive/${GITHUB_REF#refs/tags/}.tar.gz\"|" Formula/snapshell.rb
+          sed -i "s|head \"https://github.com/saswatsam786/snapshell.git\", branch: \"main\"|version \"${{ steps.get_version.outputs.VERSION }}\"|" Formula/snapshell.rb
+          
+          # Add sha256 calculation (this would need to be updated manually or via API)
+          echo "# Note: sha256 needs to be calculated and updated manually for now"
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add Formula/snapshell.rb
+          git commit -m "Update to version ${{ steps.get_version.outputs.VERSION }}" || echo "No changes to commit"
+          git push origin main
