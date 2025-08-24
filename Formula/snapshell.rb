@@ -1,7 +1,8 @@
 class Snapshell < Formula
   desc "Real-time ASCII video sharing via WebRTC in your terminal"
   homepage "https://github.com/saswatsam786/snapshell"
-  head "https://github.com/saswatsam786/snapshell.git", branch: "main"
+  url "https://github.com/saswatsam786/snapshell/archive/v1.2.0.tar.gz"
+  sha256 "76dc9a7ed68e61672488eacf415a91cdce9b7000aec68c53bec86972c06b795d"
   license "MIT"
 
   depends_on "go" => :build
