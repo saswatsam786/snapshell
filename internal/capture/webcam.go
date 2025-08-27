@@ -22,12 +22,14 @@ func OpenWebCam() (*WebCam, error) {
 
 // ReadFrame returns a new frame from the webcam
 func (w *WebCam) ReadFrame() (gocv.Mat, error) {
-	img := gocv.NewMat()
-	if ok := w.cam.Read(&img); !ok || img.Empty() {
-		return gocv.Mat{}, errors.New("failed to read frame")
-	}
+        img := gocv.NewMat()
+       if ok := w.cam.Read(&img); !ok || img.Empty() {
+               // Ensure allocated Mat resources are released on error
+               img.Close()
+               return gocv.Mat{}, errors.New("failed to read frame")
+       }
 
-	return img, nil
+       return img, nil
 }
 
 func (w *WebCam) Close() {
